@@ -1,7 +1,10 @@
 package hexfan.lyrics.ui.main;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.FrameLayout;
 
@@ -20,7 +23,7 @@ import hexfan.lyrics.ui.components.NowListenView;
 import hexfan.lyrics.ui.lyrics.LyricsFragment;
 import hexfan.lyrics.utils.SpotifyManager;
 
-public class MainActivity extends BaseActivity implements MainContract.View{
+public class MainActivity extends BaseActivity implements MainContract.View, ServiceConnection {
 
     private static final String TAG = "MainActivity";
 
@@ -59,7 +62,6 @@ public class MainActivity extends BaseActivity implements MainContract.View{
 
 
 
-        startService(new Intent(this, MyService.class));
 
 
 
@@ -176,6 +178,9 @@ public class MainActivity extends BaseActivity implements MainContract.View{
         presenter.attach(this);
         presenter.subscribeToSpotify(spotifyManager.getSpotify());
 
+
+        startService(new Intent(this, MyService.class));
+
     }
 
     @Override
@@ -222,6 +227,21 @@ public class MainActivity extends BaseActivity implements MainContract.View{
     public void displayHistory(List<TrackInfo> cacheList) {
         if(mainFragment != null)
             mainFragment.showHistory(cacheList);
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        Log.e(TAG, "onServiceConnected: "+componentName.flattenToShortString());
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName componentName) {
+        Log.e(TAG, "onServiceDisconnected: "+ componentName.flattenToShortString());
+    }
+
+    @Override
+    public void onBindingDied(ComponentName name) {
+        Log.e(TAG, "onBindingDied: "+name);
     }
 
 //    @Override
