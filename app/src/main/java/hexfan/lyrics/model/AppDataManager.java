@@ -70,6 +70,7 @@ public class AppDataManager implements DataModel {
 
                 return trackInfo;
 
+                /// genius
 //                String query = String.valueOf(artistName + " " + songName).replace(" ", "-").concat("-lyrics");
 //                String website = apiManager.getLyricsFromGenius(query).execute().body().string();
 //
@@ -101,12 +102,17 @@ public class AppDataManager implements DataModel {
     }
 
     @Override
-    public void saveTrackInfo(TrackInfo trackInfo) {
+    public void cacheTrackInfo(TrackInfo trackInfo) {
         database.tracksDao().insert(trackInfo);
     }
 
     @Override
-    public Flowable<List<TrackInfo>> getHistoryCache() {
+    public Flowable<List<TrackInfo>> getAllTrackInfoFromCache() {
         return database.tracksDao().getAllTrackInfos();
+    }
+
+    @Override
+    public Observable<Boolean> test() {
+        return null;
     }
 }

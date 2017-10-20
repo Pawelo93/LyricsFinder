@@ -14,12 +14,32 @@ import io.reactivex.Observable;
 
 public interface DataModel {
 
-    Observable<TrackInfo> getLyrics(TrackInfo trackInfo);
-
+    /**
+     * Load track info from artist and track
+     * @param artist
+     * @param track
+     * @return
+     */
     Observable<TrackInfoRequest> getTrackInfo(String artist, String track);
 
-    void saveTrackInfo(TrackInfo trackInfo);
+    /**
+     * Filling trackInfo with lyrics
+     * @param trackInfo
+     * @return
+     */
+    Observable<TrackInfo> getLyrics(TrackInfo trackInfo);
 
-    Flowable<List<TrackInfo>> getHistoryCache();
+    /**
+     * Save to database track info with lyrics
+     * @param trackInfo
+     */
+    void cacheTrackInfo(TrackInfo trackInfo);
 
+    /**
+     * Connect to database for stream of track info
+     * @return
+     */
+    Flowable<List<TrackInfo>> getAllTrackInfoFromCache();
+
+    Observable<Boolean> test();
 }

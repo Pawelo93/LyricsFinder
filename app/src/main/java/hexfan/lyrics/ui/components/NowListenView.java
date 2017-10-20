@@ -20,6 +20,9 @@ import hexfan.lyrics.model.pojo.TrackInfo;
 
 public class NowListenView extends LinearLayout {
 
+    public static final String HIDE = "hide";
+    public static final String SHOW = "show";
+
     @BindView(R.id.tvTrackTitle)
     TextView tvSongName;
     @BindView(R.id.tvArtist)

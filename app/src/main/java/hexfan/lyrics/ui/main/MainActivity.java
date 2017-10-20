@@ -1,29 +1,32 @@
 package hexfan.lyrics.ui.main;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.FrameLayout;
 
-import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import hexfan.lyrics.MyService;
+import hexfan.lyrics.utils.Config;
+import hexfan.lyrics.utils.MockSpotifyManager;
+import hexfan.lyrics.utils.SpotifyCheckService;
 import hexfan.lyrics.R;
+import hexfan.lyrics.model.DataModel;
 import hexfan.lyrics.model.pojo.TrackInfo;
 import hexfan.lyrics.ui.base.BaseActivity;
 import hexfan.lyrics.ui.base.BaseFragment;
+import hexfan.lyrics.ui.browse.BrowseFragment;
 import hexfan.lyrics.ui.components.NowListenView;
 import hexfan.lyrics.ui.lyrics.LyricsFragment;
 import hexfan.lyrics.utils.SpotifyManager;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
-public class MainActivity extends BaseActivity implements MainContract.View, ServiceConnection {
+public class MainActivity extends BaseActivity implements MainView {
 
     private static final String TAG = "MainActivity";
 
@@ -31,10 +34,19 @@ public class MainActivity extends BaseActivity implements MainContract.View, Ser
     NowListenView nowListen;
 
     @Inject
-    SpotifyManager spotifyManager;
+    SharedPreferences sharedPreferences;
+    @Inject
+    DataModel dataModel;
 
-    public MainPresenter presenter;
-    private MainFragment mainFragment;
+    private MockSpotifyManager spotifyManager;
+
+//    @Inject
+//    BehaviorSubject<TrackInfo> trackInfoBehaviorSubject;
+//    @Inject
+//    PublishSubject<String> nowListenBus;
+
+
+    private BrowseFragment browseFragment;
     private LyricsFragment lyricsFragment;
 
     public static MainActivity get(BaseFragment baseFragment){
@@ -45,120 +57,53 @@ public class MainActivity extends BaseActivity implements MainContract.View, Ser
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ButterKnife.bind(this);
-//        MainApplication.get(this).getAppComponent().inject(this);
-        spotifyManager = new SpotifyManager(this);
+        getMyComponents().inject(this);
+        spotifyManager = new MockSpotifyManager(this);
 
-        System.out.println("here "+spotifyManager);
+        browseFragment = BrowseFragment.newInstance();
+        addFragment(browseFragment);
 
+        Log.e(TAG, "onCreate: last " +sharedPreferences.getString("last_song", "empty"));
 
-
-
-        presenter = new MainPresenter(dataModel);
-
-        mainFragment = MainFragment.newInstance();
-        addFragment(mainFragment);
-
-
-
-
-
-
-
-//        AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
-//                AuthenticationResponse.Type.TOKEN,
-//                REDIRECT_URI);
-//        builder.setScopes(new String[]{"user-read-private", "streaming", "user-read-recently-played"});
-//        AuthenticationRequest request = builder.build();
-//
-//        AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
-
-
-//        getDataModel().getLyrics("All that remains", "Two weeks")
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new DisposableObserver<Lyrics>() {
-//                    @Override
-//                    public void onNext(Lyrics lyrics) {
-//                        Log.e(TAG, "onNext: artist "+lyrics.getArtistName());
-//                        Log.e(TAG, "onNext: song "+lyrics.getSongName());
-//                        Log.e(TAG, "onNext: lyrics "+lyrics.getLyrics().substring(0, 100));
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e(TAG, "onError: "+e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//
-//                    }
-//                });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        getDataModel().getLyrics("Scorpions", "Robot man")
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .map(new Function<String, String>() {
-//                    @Override
-//                    public String apply(String input) throws Exception {
-//
-//
-//                    }
-//                })
-//                .subscribe(new DisposableObserver<String>() {
-//                    @Override
-//                    public void onNext(String s) {
-//                        Log.e(TAG, "onNext: "+s);
-//                        Log.e(TAG, "onNext: ");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e(TAG, "onError: ");
-//                    }
-//
-//                    @Override
-//                    public void onComplete() {
-//
-//                    }
-//                });
-
-//        Call<ResponseBody> call = getDataModel().getLyricsFromGenius("Despised Icon", "MVP");
-//        call.enqueue(new Callback<ResponseBody>() {
+//        trackInfoBehaviorSubject.subscribe(new DisposableObserver<TrackInfo>() {
 //            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                try {
-//                    Log.e(TAG, "onResponse: "+response.body().string());
-//                    Log.e(TAG, "onResponse: ");
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+//            public void onNext(TrackInfo trackInfo) {
+//                Log.e(TAG, "onNext: "+trackInfo.getName());
+//                presenter.loadTrackInfo(trackInfo.getArtist(), trackInfo.getName());
 //            }
 //
 //            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//            public void onError(Throwable e) {
+//                Log.e(TAG, "onError: "+e.getMessage());
+//            }
+//
+//            @Override
+//            public void onComplete() {
 //
 //            }
 //        });
 
 
+//        nowListenBus.subscribe(new DisposableObserver<String>() {
+//            @Override
+//            public void onNext(String event) {
+//                if (event.equals(NowListenView.HIDE))
+//                    nowListen.setVisibility(View.GONE);
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//
+//            }
+//        });
+
+//        nowListenBus.onNext(NowListenView.HIDE);
 
     }
 
@@ -167,7 +112,6 @@ public class MainActivity extends BaseActivity implements MainContract.View, Ser
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragmentContainer, baseFragment)
-                .addToBackStack(null)
                 .commit();
 
     }
@@ -175,26 +119,29 @@ public class MainActivity extends BaseActivity implements MainContract.View, Ser
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.attach(this);
-        presenter.subscribeToSpotify(spotifyManager.getSpotify());
+//        presenter.attachView(this);
+//        presenter.subscribeToSpotify(spotifyManager.getSpotify());
 
-
-        startService(new Intent(this, MyService.class));
-
+        if(Config.START_SPOTIFY_SERVICE)
+            startSpotifyService();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        presenter.detach();
+    public void showTrackInfo(TrackInfo trackInfo){
+
+    }
+
+    private void startSpotifyService() {
+        if(!SpotifyCheckService.isServiceRunning)
+            startService(new Intent(this, SpotifyCheckService.class));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+//        presenter.detachView();
         spotifyManager.onDestroy(this);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -202,54 +149,6 @@ public class MainActivity extends BaseActivity implements MainContract.View, Ser
         if(spotifyManager != null)
             spotifyManager.onActivityResult(this, requestCode, resultCode, intent);
     }
-
-    @Override
-    public void displayNewTrack(TrackInfo trackInfo) {
-        if(!isVisable)
-            return;
-        Log.e(TAG, "displayNewTrack: new track " + trackInfo.getName());
-//        addFragment(LyricsFragment.newInstance(gson.toJson(trackInfo)));
-        if(lyricsFragment == null) {
-            lyricsFragment = LyricsFragment.newInstance(gson.toJson(trackInfo));
-            addFragment(lyricsFragment);
-        }else
-            lyricsFragment.changeTrack(trackInfo);
-    }
-
-    @Override
-    public void displayFulLTrack(TrackInfo trackInfo) {
-        Log.e(TAG, "displayFulLTrack: ");
-        if(lyricsFragment != null)
-            lyricsFragment.showFull(trackInfo);
-    }
-
-    @Override
-    public void displayHistory(List<TrackInfo> cacheList) {
-        if(mainFragment != null)
-            mainFragment.showHistory(cacheList);
-    }
-
-    @Override
-    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        Log.e(TAG, "onServiceConnected: "+componentName.flattenToShortString());
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName componentName) {
-        Log.e(TAG, "onServiceDisconnected: "+ componentName.flattenToShortString());
-    }
-
-    @Override
-    public void onBindingDied(ComponentName name) {
-        Log.e(TAG, "onBindingDied: "+name);
-    }
-
-//    @Override
-//    public void displayFulLTrackWithLyrics(TrackInfo trackInfo) {
-//        Log.e(TAG, "displayFulLTrackWithLyrics: ");
-//        if(lyricsFragment != null)
-//            lyricsFragment.changeTrack(trackInfo);
-//    }
 
 
 }

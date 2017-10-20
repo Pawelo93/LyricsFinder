@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,8 +16,10 @@ import dagger.Module;
 import dagger.Provides;
 import hexfan.lyrics.model.ApiManager;
 import hexfan.lyrics.model.AppDataManager;
+import hexfan.lyrics.model.DataModel;
 import hexfan.lyrics.model.db.AppDatabase;
 import hexfan.lyrics.ui.base.BaseActivity;
+import hexfan.lyrics.ui.main.MainActivity;
 import hexfan.lyrics.utils.SpotifyManager;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -81,8 +84,8 @@ public class AppModule {
 
     @Provides
     @AppScope
-    AppDataManager provideAppDataManager(Context context, SharedPreferences sharedPreferences,
-                                         AppDatabase database, Gson gson, ApiManager apiManager) {
+    DataModel provideAppDataModel(Context context, SharedPreferences sharedPreferences,
+                                    AppDatabase database, Gson gson, ApiManager apiManager) {
         return new AppDataManager(context, sharedPreferences, database, gson, apiManager);
     }
 
@@ -124,8 +127,10 @@ public class AppModule {
 
     @Provides
     @AppScope
-    SpotifyManager provideSpotifyManager(BaseActivity baseActivity) {
-        return new SpotifyManager(baseActivity);
+    SpotifyManager provideSpotifyManager(MainActivity mainActivity) {
+        SpotifyManager spotifyManager = new SpotifyManager(mainActivity);
+        Log.e("APPMODULE", "provideSpotifyManager: "+mainActivity + " manager "+spotifyManager);
+        return spotifyManager;
     }
 
     @Provides

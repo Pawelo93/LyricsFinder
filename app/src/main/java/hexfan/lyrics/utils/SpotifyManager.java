@@ -31,11 +31,10 @@ import io.reactivex.subjects.PublishSubject;
 public class SpotifyManager implements PlayerNotificationCallback, ConnectionStateCallback {
     private static final String TAG = "SpotifyManager";
 
-    Player player;
 
     public static final String BROADCAST_ACTION = "action_track_info";
 
-    private static final String CLIENT_ID = "7b4a1bb7b9794116bef5502c1a854617";
+    private static final String CLIENT_ID = "c61e21fe712e450290070bdc7cd9ca7a";
     private static final String REDIRECT_URI = "hexfan.lyrics://callback";
 
     public static final String TRACK_NAME = "song_name";
@@ -43,15 +42,13 @@ public class SpotifyManager implements PlayerNotificationCallback, ConnectionSta
     public static final String ALBUM_NAME = "album_name";
 
     private static final int REQUEST_CODE = 1337;
-
-    BehaviorSubject<TrackInfo> tracksSubject = BehaviorSubject.create();
-
+    private BehaviorSubject<TrackInfo> tracksSubject = BehaviorSubject.create();
+    private Player player;
 
     public SpotifyManager(BaseActivity activity){
 
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
-                AuthenticationResponse.Type.TOKEN,
-                REDIRECT_URI);
+                AuthenticationResponse.Type.TOKEN, REDIRECT_URI);
         builder.setScopes(new String[]{"user-read-private", "streaming", "user-read-recently-played"});
         AuthenticationRequest request = builder.build();
 
@@ -101,7 +98,6 @@ public class SpotifyManager implements PlayerNotificationCallback, ConnectionSta
         return tracksSubject;
     }
 
-
     public void onDestroy(BaseActivity baseActivity) {
         Spotify.destroyPlayer(this);
         player = null;
@@ -109,7 +105,6 @@ public class SpotifyManager implements PlayerNotificationCallback, ConnectionSta
             baseActivity.unregisterReceiver(broadcastReceiver);
         }
     }
-
 
     @Override
     public void onLoggedIn() {

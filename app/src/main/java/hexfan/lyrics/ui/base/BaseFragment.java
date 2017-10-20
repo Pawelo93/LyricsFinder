@@ -1,6 +1,13 @@
 package hexfan.lyrics.ui.base;
 
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.ViewModelProviders;
+import android.os.Bundle;
+import android.support.annotation.CallSuper;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
 import butterknife.Unbinder;
 
@@ -8,19 +15,9 @@ import butterknife.Unbinder;
  * Created by Pawel on 20.06.2017.
  */
 
-public class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
-    private Unbinder unbinder;
 
-    protected void setUnbinder(Unbinder unbinder){
-        this.unbinder = unbinder;
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if(unbinder != null) {
-            unbinder.unbind();
-        }
-    }
 }
+

@@ -3,6 +3,7 @@ package hexfan.lyrics.ui.components;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.yarolegovich.discretescrollview.DiscreteScrollView;
 import com.yarolegovich.discretescrollview.transform.Pivot;
 import com.yarolegovich.discretescrollview.transform.ScaleTransformer;
@@ -20,13 +22,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import hexfan.lyrics.R;
 import hexfan.lyrics.model.pojo.TrackInfo;
-import hexfan.lyrics.ui.base.BaseActivity;
+import hexfan.lyrics.ui.base.adapter.EaseAdapter;
+import hexfan.lyrics.ui.base.adapter.EaseAdapterContract;
 
 /**
  * Created by Pawel on 29.07.2017.
  */
 
-public class MainView extends LinearLayout {
+public class HistoryView extends LinearLayout implements EaseAdapterContract<TrackInfo, HistoryView.ViewHolder>{
 
     @BindView(R.id.tvTrackTitle)
     TextView tvSongName;
@@ -35,17 +38,22 @@ public class MainView extends LinearLayout {
     @BindView(R.id.picker)
     DiscreteScrollView picker;
 
-    private Adapter adapter;
+    private EaseAdapter<TrackInfo, HistoryView.ViewHolder> adapter;
+    private HistoryViewContract historyViewContract;
 
-    public MainView(Context context) {
+    private Picasso picasso;
+
+    public HistoryView(Context context) {
         super(context);
 
-        LayoutInflater.from(context).inflate(R.layout.main_view, this);
+        LayoutInflater.from(context).inflate(R.layout.history_view, this);
         ButterKnife.bind(this);
 
     }
 
-    public void setup(final List<TrackInfo> list){
+    public void setup(HistoryViewContract historyViewContract, Picasso picasso, final List<TrackInfo> list){
+        this.historyViewContract = historyViewContract;
+        this.picasso = picasso;
 
         if (list.size() == 0) {
             tvArtistName.setVisibility(GONE);
@@ -54,7 +62,8 @@ public class MainView extends LinearLayout {
             return;
         }
 
-        adapter = new Adapter(list);
+        adapter = new EaseAdapter<>(this);
+//        adapter = new Adapter(historyViewContract, picasso, list);
 
         picker.setAdapter(adapter);
         picker.setItemTransformer(new ScaleTransformer.Builder()
@@ -72,31 +81,26 @@ public class MainView extends LinearLayout {
         });
     }
 
-    private class Adapter extends RecyclerView.Adapter<ViewHolder>{
-
-        private List<TrackInfo> list;
-
-        public Adapter(List<TrackInfo> list){
-            this.list = list;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return ViewHolder.create(MainView.this.getContext(), parent);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.bind(list.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return list.size();
-        }
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return ViewHolder.create(HistoryView.this.getContext(), parent);
     }
 
-    private static class ViewHolder extends RecyclerView.ViewHolder{
+    @Override
+    public void onBindViewHolder(TrackInfo element, ViewHolder holder) {
+        holder.bind(picasso, element);
+    }
+
+    @Override
+    public void onItemClicked(TrackInfo item) {
+        Log.e("MainView", "onItemClicked: "+item.getName());
+    }
+
+    public interface HistoryViewContract {
+        void onClick(TrackInfo trackInfo);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder{
 
         ImageView ivCover;
 
@@ -106,14 +110,11 @@ public class MainView extends LinearLayout {
 
         public ViewHolder(View itemView) {
             super(itemView);
-
             ivCover = itemView.findViewById(R.id.ivCover);
         }
 
-        public void bind(TrackInfo trackInfo){
-
-            ((BaseActivity) itemView.getContext()).getPicasso()
-                    .load(trackInfo.getAlbumCover())
+        public void bind(Picasso picasso, final TrackInfo trackInfo){
+            picasso.load(trackInfo.getAlbumCover())
                     .placeholder(R.mipmap.ic_launcher)
                     .fit()
                     .centerCrop()

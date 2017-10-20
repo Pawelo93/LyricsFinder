@@ -120,6 +120,9 @@ public class TrackInfoRequest {
 
     public ArrayList<String> getTags() {
         ArrayList<String> tags = new ArrayList<>();
+        if(track == null || track.topTags == null || track.topTags.tags != null)
+            return tags;
+
         for (Tag tag : track.topTags.tags) {
             tags.add(tag.name);
         }

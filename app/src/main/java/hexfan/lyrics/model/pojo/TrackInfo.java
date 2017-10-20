@@ -119,4 +119,43 @@ public class TrackInfo {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TrackInfo trackInfo = (TrackInfo) o;
+
+        if (id != trackInfo.id) return false;
+        if (lyrics != null ? !lyrics.equals(trackInfo.lyrics) : trackInfo.lyrics != null)
+            return false;
+        if (name != null ? !name.equals(trackInfo.name) : trackInfo.name != null) return false;
+        if (artist != null ? !artist.equals(trackInfo.artist) : trackInfo.artist != null)
+            return false;
+        if (album != null ? !album.equals(trackInfo.album) : trackInfo.album != null) return false;
+        if (albumCover != null ? !albumCover.equals(trackInfo.albumCover) : trackInfo.albumCover != null)
+            return false;
+        if (duration != null ? !duration.equals(trackInfo.duration) : trackInfo.duration != null)
+            return false;
+        if (listeners != null ? !listeners.equals(trackInfo.listeners) : trackInfo.listeners != null)
+            return false;
+        if (tags != null ? !tags.equals(trackInfo.tags) : trackInfo.tags != null) return false;
+        return description != null ? description.equals(trackInfo.description) : trackInfo.description == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = lyrics != null ? lyrics.hashCode() : 0;
+        result = 31 * result + id;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (artist != null ? artist.hashCode() : 0);
+        result = 31 * result + (album != null ? album.hashCode() : 0);
+        result = 31 * result + (albumCover != null ? albumCover.hashCode() : 0);
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
+        result = 31 * result + (listeners != null ? listeners.hashCode() : 0);
+        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        return result;
+    }
 }

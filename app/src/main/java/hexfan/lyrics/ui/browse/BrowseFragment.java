@@ -1,4 +1,4 @@
-package hexfan.lyrics.ui.main;
+package hexfan.lyrics.ui.browse;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,35 +8,37 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import hexfan.lyrics.R;
-import hexfan.lyrics.model.pojo.TrackInfo;
-import hexfan.lyrics.ui.base.BaseActivity;
+import hexfan.lyrics.model.DataModel;
 import hexfan.lyrics.ui.base.BaseFragment;
-import hexfan.lyrics.ui.components.MainView;
+import hexfan.lyrics.ui.components.HistoryView;
+import hexfan.lyrics.ui.main.MainApplication;
 
 /**
  * Created by Pawel on 30.07.2017.
  */
 
-public class MainFragment extends BaseFragment {
+public class BrowseFragment extends BaseFragment implements BrowseView{
 
     @BindView(R.id.etSearch)
     EditText etSearch;
     @BindView(R.id.container)
     FrameLayout container;
 
-    private MainView mainView;
+    @Inject
+    DataModel dataModel;
 
-    public static MainFragment newInstance() {
+    private HistoryView historyView;
+
+    public static BrowseFragment newInstance() {
         
         Bundle args = new Bundle();
 
-        MainFragment fragment = new MainFragment();
+        BrowseFragment fragment = new BrowseFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,16 +48,17 @@ public class MainFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.main_fragment, container, false);
         ButterKnife.bind(this, view);
+        MainApplication.get(this).getMyComponents().inject(this);
         init();
         return view;
     }
 
     private void init(){
 
-        mainView = new MainView(getContext());
-        container.addView(mainView);
+        historyView = new HistoryView(getContext());
+        container.addView(historyView);
 
-        MainActivity.get(this).presenter.loadHistoryCache();
+//        MainActivity.get(this).presenter.loadHistoryCache();
 
 //        presenter.getTrackInfo("Scorpions", "Robot Man");
 
@@ -63,8 +66,9 @@ public class MainFragment extends BaseFragment {
 
     }
 
-    public void showHistory(List<TrackInfo> cacheList) {
-        mainView.setup(cacheList);
-
+    @Override
+    public void onResume() {
+        super.onResume();
     }
+
 }

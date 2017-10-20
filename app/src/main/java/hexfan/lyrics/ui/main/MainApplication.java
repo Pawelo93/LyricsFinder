@@ -1,14 +1,14 @@
 package hexfan.lyrics.ui.main;
 
 import android.app.Application;
-import android.content.Intent;
 import android.test.mock.MockApplication;
 
-import hexfan.lyrics.MyService;
-import hexfan.lyrics.di.AppComponent;
+import hexfan.lyrics.di.DaggerMyComponents;
+import hexfan.lyrics.di.MyComponents;
 import hexfan.lyrics.di.AppModule;
-import hexfan.lyrics.di.DaggerAppComponent;
 import hexfan.lyrics.ui.base.BaseActivity;
+import hexfan.lyrics.ui.base.BaseFragment;
+import hexfan.lyrics.ui.browse.BrowseFragment;
 
 /**
  * Created by Pawel on 20.06.2017.
@@ -16,21 +16,26 @@ import hexfan.lyrics.ui.base.BaseActivity;
 
 public class MainApplication extends Application {
 
-    AppComponent appComponent;
+    MyComponents myComponents;
 
     public static MainApplication get(BaseActivity baseActivity) {
         return ((MainApplication) baseActivity.getApplication());
+    }
+
+    public static MainApplication get(BaseFragment baseFragment) {
+        return ((MainApplication) baseFragment.getActivity().getApplication());
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        appComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
+        myComponents = DaggerMyComponents.builder().appModule(new AppModule(this)).build();
 
     }
 
-    public AppComponent getAppComponent(){
-        return appComponent;
+    public MyComponents getMyComponents(){
+        return myComponents;
     }
+
 }

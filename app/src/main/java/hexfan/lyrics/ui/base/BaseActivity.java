@@ -1,88 +1,60 @@
 package hexfan.lyrics.ui.base;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
-import com.google.gson.Gson;
-import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import butterknife.Unbinder;
-import hexfan.lyrics.model.AppDataManager;
-import hexfan.lyrics.model.DataModel;
-import hexfan.lyrics.ui.lyrics.LyricsFragment;
+import hexfan.lyrics.di.MyComponents;
 import hexfan.lyrics.ui.main.MainApplication;
+
+import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
+
 
 /**
  * Created by Pawel on 20.06.2017.
  */
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
-    @Inject
-    protected AppDataManager dataModel;
-    @Inject
-    protected Picasso picasso;
-    @Inject
-    protected Gson gson;
 
-    private List<Unbinder> unbinders = new ArrayList<>();
-    protected boolean isVisable = true;
-
-    public static BaseActivity get(BaseFragment baseFragment) {
-        return ((BaseActivity) baseFragment.getActivity());
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        MainApplication.get(this).getAppComponent().inject(this);
-
-    }
-
-    protected void setUnbinder(Unbinder unbinder){
-        unbinders.add(unbinder);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        isVisable = true;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        isVisable = false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (unbinders.size() > 0) {
-            for(Unbinder unbinder : unbinders)
-                unbinder.unbind();
-        }
-        super.onDestroy();
-    }
-
-    public Picasso getPicasso() {
-        return picasso;
-    }
-
-    public Gson getGson() {
-        return gson;
-    }
-
-    public DataModel getDataModel(){
-        return dataModel;
+    public static BaseActivity get(BaseFragment fragment){
+        return (BaseActivity) fragment.getActivity();
     }
 
 
 
+    public MyComponents getMyComponents() {
+        return ((MainApplication) getApplication()).getMyComponents();
+    }
+
+
+    /**
+     * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
+     * performed by the {@code fragmentManager}.
+     *
+     */
+    public static void addFragmentToActivity (@NonNull FragmentManager fragmentManager,
+                                              @NonNull Fragment fragment, int frameId) {
+        checkNotNull(fragmentManager);
+        checkNotNull(fragment);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(frameId, fragment);
+        transaction.commit();
+    }
+
+    /**
+     * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
+     * performed by the {@code fragmentManager}.
+     *
+     */
+    public static void addFragmentToActivity (@NonNull FragmentManager fragmentManager,
+                                              @NonNull Fragment fragment, String tag) {
+        checkNotNull(fragmentManager);
+        checkNotNull(fragment);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(fragment, tag);
+        transaction.commit();
+    }
 }

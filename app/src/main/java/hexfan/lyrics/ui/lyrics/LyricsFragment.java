@@ -9,21 +9,26 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import hexfan.lyrics.R;
+import hexfan.lyrics.model.DataModel;
 import hexfan.lyrics.model.pojo.TrackInfo;
-import hexfan.lyrics.ui.base.BaseActivity;
 import hexfan.lyrics.ui.base.BaseFragment;
-import hexfan.lyrics.ui.main.MainActivity;
+import hexfan.lyrics.ui.main.MainApplication;
 
 /**
  * Created by Pawel on 30.07.2017.
  */
 
-public class LyricsFragment extends BaseFragment {
+public class LyricsFragment extends BaseFragment implements LyricsView {
 
-    private static final String KEY_TRACK_INFO = "track_info";
+    private static final String KEY_ARTIST = "artist";
+    private static final String KEY_TRACK = "track";
 
     @BindView(R.id.ivCover)
     ImageView ivCover;
@@ -36,10 +41,16 @@ public class LyricsFragment extends BaseFragment {
     @BindView(R.id.tvLyrics)
     TextView tvLirycs;
 
-    public static LyricsFragment newInstance(String trackInfo) {
+    @Inject
+    DataModel dataModel;
+    @Inject
+    Picasso picasso;
+
+    public static LyricsFragment newInstance(String artist, String track) {
 
         Bundle args = new Bundle();
-        args.putString(KEY_TRACK_INFO, trackInfo);
+        args.putString(KEY_ARTIST, artist);
+        args.putString(KEY_TRACK, track);
         LyricsFragment fragment = new LyricsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -50,13 +61,19 @@ public class LyricsFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.lyrics_fragment, container, false);
         ButterKnife.bind(this, view);
-        init();
+        MainApplication.get(this).getMyComponents().inject(this);
+//        init();
         return view;
     }
 
+
+
     private void init(){
-        TrackInfo trackInfo = BaseActivity.get(this).getGson().fromJson(getArguments().getString(KEY_TRACK_INFO), TrackInfo.class);
-        changeTrack(trackInfo);
+
+
+
+//        TrackInfo trackInfo = BaseActivity.get(this).getGson().fromJson(getArguments().getString(KEY_TRACK_INFO), TrackInfo.class);
+//        changeTrack(trackInfo);
 
     }
 
@@ -65,7 +82,8 @@ public class LyricsFragment extends BaseFragment {
         tvTrackTitle.setText(trackInfo.getName());
         tvArtist.setText(trackInfo.getArtist());
 
-        MainActivity.get(this).presenter.getTrackInfo(trackInfo.getArtist(), trackInfo.getName());
+//        if(MainActivity.get(this).presenter != null)
+//            MainActivity.get(this).presenter.getTrackInfo(trackInfo.getArtist(), trackInfo.getName());
     }
 
     public void showFull(TrackInfo trackInfo){
@@ -76,11 +94,13 @@ public class LyricsFragment extends BaseFragment {
             tvLirycs.setText(trackInfo.getLyrics());
 
         if(trackInfo.getAlbumCover() != null) {
-            MainActivity.get(this)
-                    .getPicasso()
+            picasso
                     .load(trackInfo.getAlbumCover())
                     .fit()
                     .into(ivCover);
         }
     }
+
+
+
 }
