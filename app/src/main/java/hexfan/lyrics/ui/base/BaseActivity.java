@@ -1,13 +1,18 @@
 package hexfan.lyrics.ui.base;
 
+import android.arch.lifecycle.LifecycleRegistry;
+import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
-import hexfan.lyrics.di.MyComponents;
 import hexfan.lyrics.ui.main.MainApplication;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
@@ -16,19 +21,42 @@ import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
  * Created by Pawel on 20.06.2017.
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements LifecycleRegistryOwner {
 
+    protected LifecycleRegistry lifecycleRegistry;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static BaseActivity get(BaseFragment fragment){
         return (BaseActivity) fragment.getActivity();
     }
 
-
-
-    public MyComponents getMyComponents() {
-        return ((MainApplication) getApplication()).getMyComponents();
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        lifecycleRegistry = new LifecycleRegistry(this);
+        super.onCreate(savedInstanceState);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bind();
+    }
+
+    @Override
+    protected void onPause() {
+        unbind();
+        super.onPause();
+    }
+
+    public void addSubscribe(Disposable disposable) {
+        compositeDisposable.add(disposable);
+    }
+
+    public abstract void bind();
+
+    public void unbind(){
+        compositeDisposable.clear();
+    }
 
     /**
      * The {@code fragment} is added to the container view with id {@code frameId}. The operation is
@@ -56,5 +84,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(fragment, tag);
         transaction.commit();
+    }
+
+    @Override
+    public LifecycleRegistry getLifecycle() {
+        return lifecycleRegistry;
     }
 }

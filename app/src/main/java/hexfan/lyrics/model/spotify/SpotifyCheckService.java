@@ -1,4 +1,4 @@
-package hexfan.lyrics.utils;
+package hexfan.lyrics.model.spotify;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -10,14 +10,14 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
+import hexfan.lyrics.di.Injector;
 import hexfan.lyrics.model.pojo.TrackInfo;
-import hexfan.lyrics.ui.main.MainApplication;
 import io.reactivex.subjects.BehaviorSubject;
 
 
@@ -28,26 +28,22 @@ import io.reactivex.subjects.BehaviorSubject;
 public class SpotifyCheckService extends Service {
     private static final String TAG = "SpotifyCheckService";
     public static boolean isServiceRunning;
+    public static final String LAST_SONG_NAME = "last_song_name";
+
     private Looper mServiceLooper;
 
     private ServiceHandler mServiceHandler;
 
     @Inject
-    BehaviorSubject<TrackInfo> trackInfoBehaviorSubject;
+    BehaviorSubject<TrackInfo> trackInfoBus;
 
     @Override
     public void onCreate() {
-        Log.e(TAG, "onCreate: ");
+        Injector.inject(this);
         // To avoid cpu-blocking, we create a background handler to run our service
         HandlerThread thread = new HandlerThread("TutorialService", Thread.NORM_PRIORITY);
         // start the new handler thread
         thread.start();
-
-        ((MainApplication) getApplication()).getMyComponents().inject(this);
-
-//        mServiceLooper = thread.getLooper();
-        // start the service using the background handler
-//        mServiceHandler = new ServiceHandler(mServiceLooper);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.spotify.music.metadatachanged");
@@ -89,15 +85,15 @@ public class SpotifyCheckService extends Service {
                 trackInfo.setName(trackName);
                 trackInfo.setAlbum(albumName);
 
-                trackInfoBehaviorSubject.onNext(trackInfo);
+                trackInfoBus.onNext(trackInfo);
 
                 Log.e("MyBroadcastReceiver", "metadata id "+trackId+" artist " + artistName + " track "+trackName);
 
 
-                if(trackName != null) {
-                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("last_song", trackName).apply();
-                    Log.e(TAG, "onReceive: saved " + trackName);
-                }
+//                if(trackName != null) {
+//                    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(LAST_SONG_NAME, trackName).apply();
+//                    Log.e(TAG, "onReceive: saved " + trackName);
+//                }
 
                 // Do something with extracted information...
             } else if (action.equals(BroadcastTypes.PLAYBACK_STATE_CHANGED)) {

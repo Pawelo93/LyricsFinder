@@ -6,5 +6,9 @@ package hexfan.lyrics.utils;
 
 public class Config {
 
-    public static final boolean START_SPOTIFY_SERVICE = false;
+    public static boolean START_SPOTIFY_SERVICE = true;
+
+    public static void test() {
+        START_SPOTIFY_SERVICE = false;
+    }
 }

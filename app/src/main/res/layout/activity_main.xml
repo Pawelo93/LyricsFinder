@@ -19,9 +19,12 @@
     </FrameLayout>
 
     <hexfan.lyrics.ui.components.NowListenView
+        android:visibility="gone"
+        tools:visibility="visible"
         android:id="@+id/nowListen"
         android:layout_width="match_parent"
         android:layout_height="50dp"/>
+
     <!--<FrameLayout-->
         <!--android:id="@+id/nowListen"-->
         <!--android:background="#ccc"-->

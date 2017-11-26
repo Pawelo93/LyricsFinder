@@ -1,5 +1,7 @@
 package hexfan.lyrics.di;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 import hexfan.lyrics.model.pojo.TrackInfo;
@@ -24,6 +26,4 @@ public class RxBusModule {
     PublishSubject<String> nowListenBus(){
         return PublishSubject.create();
     }
-
-
 }

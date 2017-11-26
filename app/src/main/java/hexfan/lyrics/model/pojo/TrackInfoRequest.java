@@ -77,6 +77,9 @@ public class TrackInfoRequest {
         String content;
     }
 
+    public void setName(String name) {
+        this.track.name = name;
+    }
 
     public void setAlbumTitle(String albumTitle) {
         track.album.title = albumTitle;
@@ -132,4 +135,6 @@ public class TrackInfoRequest {
     public String getDescription() {
         return track.wiki.content;
     }
+
+
 }

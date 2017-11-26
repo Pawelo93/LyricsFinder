@@ -1,36 +1,76 @@
 package hexfan.lyrics.ui.main;
 
 
+import android.app.Application;
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+
 
 import hexfan.lyrics.model.DataModel;
+import hexfan.lyrics.model.DatabaseDataModel;
 import hexfan.lyrics.model.pojo.TrackInfo;
-import io.reactivex.Flowable;
+import hexfan.lyrics.ui.base.BaseActivity;
+import hexfan.lyrics.model.spotify.SpotifyModel;
 import io.reactivex.Observable;
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Pawel on 17.10.2017.
  */
-public class MainViewModel {
+public class MainViewModel extends ViewModel {
 
     private DataModel model;
+    private DatabaseDataModel databaseModel;
+    private SpotifyModel spotifyModel;
 
-    private BehaviorSubject<TrackInfo> trackInfoBehaviorSubject;
-
-    public MainViewModel(DataModel model) {
+    public MainViewModel(DataModel model, DatabaseDataModel databaseModel, SpotifyModel spotifyModel) {
         this.model = model;
-        trackInfoBehaviorSubject = BehaviorSubject.create();
+        this.databaseModel = databaseModel;
+        this.spotifyModel = spotifyModel;
     }
 
-    public Observable<TrackInfo> trackInfo() {
-        return trackInfoBehaviorSubject;
+    public Observable<TrackInfo> observeTrackInfo() {
+        return model.subscribeRawTrackInfo()
+                .skipWhile(trackInfo -> trackInfo.getName().equals(""))
+                .flatMap(trackInfo -> Single.zip(model.getTrackInfo(trackInfo.getArtist(), trackInfo.getName()),
+                        model.getLyrics(trackInfo).onErrorReturn(throwable -> trackInfo), (trackWithData, trackWithLyrics) -> {
+                            trackWithData.setLyrics(trackWithLyrics.getLyrics());
+
+                            if(trackWithData.getAlbumCover() != null && !trackWithData.getAlbumCover().equals("") &&
+                                    trackWithData.getLyrics() != null && !trackWithData.getLyrics().equals("")) {
+                                databaseModel.cacheTrackInfo(trackWithData);
+                            }
+                            return trackWithData;
+                        })
+                        .onErrorReturn(throwable -> trackInfo)
+                        .toObservable()
+                        .startWith(trackInfo))
+                .observeOn(AndroidSchedulers.mainThread());
     }
+
+    public void onDestroy(BaseActivity baseActivity) {
+        if (spotifyModel != null)
+            spotifyModel.onDestroy(baseActivity);
+    }
+
+    public void onActivityResult(BaseActivity baseActivity, int requestCode, int resultCode, Intent intent) {
+        if (spotifyModel != null)
+            spotifyModel.onActivityResult(baseActivity, requestCode, resultCode, intent);
+    }
+
+//    public Flowable<List<TrackInfo>> observeHistory() {
+//        return model.getAllTrackInfoFromCache();
+//    }
+
 
 //    @Override
 //    public void subscribeToSpotify(Observable<TrackInfo> observable) {
 //        addSubscriber(observable, new DisposableObserver<TrackInfo>() {
 //            @Override
-//            public void onNext(TrackInfo trackInfo) {
+//            public void onNext(TrackInfo observeTrackInfo) {
 //
 //            }
 //
@@ -55,8 +95,8 @@ public class MainViewModel {
 //            }
 //        }), new DisposableObserver<TrackInfo>() {
 //            @Override
-//            public void onNext(TrackInfo trackInfo) {
-//                view.displayNewTrack(trackInfo);
+//            public void onNext(TrackInfo observeTrackInfo) {
+//                view.displayNewTrack(observeTrackInfo);
 //            }
 //
 //            @Override
@@ -70,4 +110,32 @@ public class MainViewModel {
 //            }
 //        });
 //    }
+
+    /**
+     * Helping create view model with custom constructor
+     */
+    public static class Factory extends ViewModelProviders.DefaultFactory {
+
+        DataModel dataModel;
+        DatabaseDataModel databaseModel;
+        SpotifyModel spotifyModel;
+
+        /**
+         * Creates a {@code DefaultFactory}
+         *
+         * @param application an application to pass in {@link MainViewModel}
+         */
+        public Factory(@NonNull Application application, DataModel dataModel, DatabaseDataModel databaseModel,
+                       SpotifyModel spotifyModel) {
+            super(application);
+            this.dataModel = dataModel;
+            this.databaseModel = databaseModel;
+            this.spotifyModel = spotifyModel;
+        }
+
+        @Override
+        public <T extends ViewModel> T create(Class<T> modelClass) {
+            return (T) new MainViewModel(dataModel, databaseModel, spotifyModel);
+        }
+    }
 }

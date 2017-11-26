@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,15 +11,18 @@ import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.TimeUnit;
 
+import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import hexfan.lyrics.model.ApiManager;
-import hexfan.lyrics.model.AppDataManager;
+import hexfan.lyrics.model.DataManager;
 import hexfan.lyrics.model.DataModel;
+import hexfan.lyrics.model.DatabaseDataManager;
+import hexfan.lyrics.model.DatabaseDataModel;
 import hexfan.lyrics.model.db.AppDatabase;
-import hexfan.lyrics.ui.base.BaseActivity;
-import hexfan.lyrics.ui.main.MainActivity;
-import hexfan.lyrics.utils.SpotifyManager;
+import hexfan.lyrics.model.pojo.TrackInfo;
+import hexfan.lyrics.ui.main.MainApplication;
+import io.reactivex.subjects.BehaviorSubject;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -33,36 +35,36 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Pawel on 20.06.2017.
  */
 
-@Module
+@Module(includes = RxBusModule.class)
 public class AppModule {
 
-    private Application application;
+    Application application;
 
-    public AppModule(Application application) {
+    public AppModule(Application application){
         this.application = application;
     }
 
     @Provides
     @AppScope
-    Application providesApplication(){
+    Application provideApplication(){
         return application;
     }
 
     @Provides
     @AppScope
-    Context providesContext(Application application){
+    Context providesContext(){
         return application.getApplicationContext();
     }
 
     @Provides
     @AppScope
-    Picasso providePicasso(Application application) {
+    Picasso providePicasso() {
         return new Picasso.Builder(application).build();
     }
 
     @Provides
     @AppScope
-    SharedPreferences providesSharedPreferences(Application application){
+    SharedPreferences providesSharedPreferences(){
         return PreferenceManager.getDefaultSharedPreferences(application);
     }
 
@@ -84,14 +86,19 @@ public class AppModule {
 
     @Provides
     @AppScope
-    DataModel provideAppDataModel(Context context, SharedPreferences sharedPreferences,
-                                    AppDatabase database, Gson gson, ApiManager apiManager) {
-        return new AppDataManager(context, sharedPreferences, database, gson, apiManager);
+    DataModel provideMainDataModel(ApiManager apiManager, BehaviorSubject<TrackInfo> bus){
+        return new DataManager(apiManager, bus);
     }
 
     @Provides
     @AppScope
-    Cache providesHttpCache(Application application){
+    DatabaseDataModel provideDatabaseDataModel(AppDatabase database){
+        return new DatabaseDataManager(database);
+    }
+
+    @Provides
+    @AppScope
+    Cache providesHttpCache(){
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         return new Cache(application.getCacheDir(), cacheSize);
     }
@@ -115,7 +122,7 @@ public class AppModule {
 
     @Provides
     @AppScope
-    Retrofit provideRetrofit(Context context, Gson gson, OkHttpClient okHttpClient) {
+    Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient) {
 
         return new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -127,16 +134,7 @@ public class AppModule {
 
     @Provides
     @AppScope
-    SpotifyManager provideSpotifyManager(MainActivity mainActivity) {
-        SpotifyManager spotifyManager = new SpotifyManager(mainActivity);
-        Log.e("APPMODULE", "provideSpotifyManager: "+mainActivity + " manager "+spotifyManager);
-        return spotifyManager;
-    }
-
-    @Provides
-    @AppScope
     AppDatabase provideAppDatabase(Context context) {
-//        return AppDatabase.getDatabase(context);
         return AppDatabase.getDatabase(context);
     }
 }

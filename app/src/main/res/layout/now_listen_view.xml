@@ -27,14 +27,14 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/tvTrackTitle"
+            android:id="@+id/tvNowListenTitle"
             android:text="Tytuł"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/tvArtist"
+            android:id="@+id/tvNowListenArtist"
             android:text="Nazwa zespołu"
             android:layout_marginTop="4dp"
             android:layout_width="wrap_content"

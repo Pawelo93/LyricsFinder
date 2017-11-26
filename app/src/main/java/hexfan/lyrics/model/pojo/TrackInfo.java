@@ -2,6 +2,8 @@ package hexfan.lyrics.model.pojo;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
  */
 
 @Entity
-public class TrackInfo {
+public class TrackInfo implements Parcelable{
 
     private String lyrics;
 
@@ -26,6 +28,35 @@ public class TrackInfo {
     private String listeners;
     private ArrayList<String> tags;
     private String description;
+
+    public TrackInfo(){
+
+    }
+
+    protected TrackInfo(Parcel in) {
+        lyrics = in.readString();
+        id = in.readInt();
+        name = in.readString();
+        artist = in.readString();
+        album = in.readString();
+        albumCover = in.readString();
+        duration = in.readString();
+        listeners = in.readString();
+        tags = in.createStringArrayList();
+        description = in.readString();
+    }
+
+    public static final Creator<TrackInfo> CREATOR = new Creator<TrackInfo>() {
+        @Override
+        public TrackInfo createFromParcel(Parcel in) {
+            return new TrackInfo(in);
+        }
+
+        @Override
+        public TrackInfo[] newArray(int size) {
+            return new TrackInfo[size];
+        }
+    };
 
     public static TrackInfo fromTrackInfoRequest(TrackInfoRequest trackInfoRequest) {
         TrackInfo trackInfo = new TrackInfo();
@@ -158,4 +189,41 @@ public class TrackInfo {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "TrackInfo{" +
+                "lyrics='" + lyrics + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", artist='" + artist + '\'' +
+                ", album='" + album + '\'' +
+                ", albumCover='" + albumCover + '\'' +
+                ", duration='" + duration + '\'' +
+                ", listeners='" + listeners + '\'' +
+                ", tags=" + tags +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(lyrics);
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(artist);
+        dest.writeString(album);
+        dest.writeString(albumCover);
+        dest.writeString(duration);
+        dest.writeString(listeners);
+        dest.writeStringList(tags);
+        dest.writeString(description);
+    }
+
+
 }

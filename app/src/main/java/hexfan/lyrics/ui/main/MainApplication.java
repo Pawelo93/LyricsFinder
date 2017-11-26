@@ -1,22 +1,21 @@
 package hexfan.lyrics.ui.main;
 
 import android.app.Application;
-import android.test.mock.MockApplication;
 
-import hexfan.lyrics.di.DaggerMyComponents;
-import hexfan.lyrics.di.MyComponents;
+import hexfan.lyrics.di.AppComponent;
 import hexfan.lyrics.di.AppModule;
+import hexfan.lyrics.di.DaggerAppComponent;
 import hexfan.lyrics.ui.base.BaseActivity;
 import hexfan.lyrics.ui.base.BaseFragment;
-import hexfan.lyrics.ui.browse.BrowseFragment;
 
 /**
  * Created by Pawel on 20.06.2017.
  */
 
-public class MainApplication extends Application {
+public class MainApplication extends Application{
 
-    MyComponents myComponents;
+    public static MainApplication INSTANCE;
+    public AppComponent component;
 
     public static MainApplication get(BaseActivity baseActivity) {
         return ((MainApplication) baseActivity.getApplication());
@@ -29,13 +28,13 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        INSTANCE = this;
+        component = DaggerAppComponent
+                .builder()
+                .appModule(new AppModule(this))
+                .build();
 
-        myComponents = DaggerMyComponents.builder().appModule(new AppModule(this)).build();
+        component.inject(this);
 
     }
-
-    public MyComponents getMyComponents(){
-        return myComponents;
-    }
-
 }

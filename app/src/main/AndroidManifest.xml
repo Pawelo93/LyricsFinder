@@ -3,6 +3,7 @@
     package="hexfan.lyrics">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".ui.main.MainApplication"
@@ -12,8 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.main.MainActivity"
-            android:configChanges="orientation|screenSize">
+        <activity android:name=".ui.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,7 @@
 
 
         <service
-            android:name=".utils.SpotifyCheckService"
+            android:name=".model.spotify.SpotifyCheckService"
             android:exported="false"/>
 
 

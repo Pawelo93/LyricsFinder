@@ -21,8 +21,8 @@ public class LyricsViewModel {
 //                    }
 //                }), new DisposableObserver<TrackInfo>() {
 //            @Override
-//            public void onNext(TrackInfo trackInfo) {
-////                        getLyrics(trackInfo);
+//            public void onNext(TrackInfo observeTrackInfo) {
+////                        getLyrics(observeTrackInfo);
 //            }
 //
 //            @Override
@@ -38,19 +38,19 @@ public class LyricsViewModel {
 //    }
 //
 //    @Override
-//    public void loadLyrics(TrackInfo trackInfo) {
-//        addSubscriber(model.getLyrics(trackInfo).map(new Function<TrackInfo, TrackInfo>() {
+//    public void loadLyrics(TrackInfo observeTrackInfo) {
+//        addSubscriber(model.getLyrics(observeTrackInfo).map(new Function<TrackInfo, TrackInfo>() {
 //            @Override
-//            public TrackInfo apply(TrackInfo trackInfo) throws Exception {
-//                if(trackInfo != null)
-//                    model.cacheTrackInfo(trackInfo);
+//            public TrackInfo apply(TrackInfo observeTrackInfo) throws Exception {
+//                if(observeTrackInfo != null)
+//                    model.cacheTrackInfo(observeTrackInfo);
 //
-//                return trackInfo;
+//                return observeTrackInfo;
 //            }
 //        }), new DisposableObserver<TrackInfo>() {
 //            @Override
-//            public void onNext(TrackInfo trackInfo) {
-////                view.displayFulLTrack(trackInfo);
+//            public void onNext(TrackInfo observeTrackInfo) {
+////                view.displayFulLTrack(observeTrackInfo);
 //            }
 //
 //            @Override

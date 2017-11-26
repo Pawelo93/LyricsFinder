@@ -1,4 +1,4 @@
-package hexfan.lyrics.ui.main;
+package hexfan.lyrics;
 
 /**
  * Created by Pawel on 11.07.2017.

@@ -3,6 +3,7 @@ package hexfan.lyrics.ui.components;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,29 +42,22 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
     private EaseAdapter<TrackInfo, HistoryView.ViewHolder> adapter;
     private HistoryViewContract historyViewContract;
 
-    private Picasso picasso;
+    Picasso picasso;
 
-    public HistoryView(Context context) {
-        super(context);
+    public HistoryView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+//        MainApplication.getComponent(context).create(this);
+//        ((ComponentInterface) ((Activity) context).getApplication()).getComponent().create(this);
 
         LayoutInflater.from(context).inflate(R.layout.history_view, this);
         ButterKnife.bind(this);
-
     }
 
-    public void setup(HistoryViewContract historyViewContract, Picasso picasso, final List<TrackInfo> list){
-        this.historyViewContract = historyViewContract;
+    public void setup(Picasso picasso, HistoryViewContract historyViewContract){
         this.picasso = picasso;
-
-        if (list.size() == 0) {
-            tvArtistName.setVisibility(GONE);
-            picker.setVisibility(GONE);
-            tvSongName.setText("Brak historii");
-            return;
-        }
+        this.historyViewContract = historyViewContract;
 
         adapter = new EaseAdapter<>(this);
-//        adapter = new Adapter(historyViewContract, picasso, list);
 
         picker.setAdapter(adapter);
         picker.setItemTransformer(new ScaleTransformer.Builder()
@@ -72,11 +66,12 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
                 .setPivotX(Pivot.X.CENTER) // CENTER is a default one
                 .setPivotY(Pivot.Y.CENTER) // CENTER is a default one
                 .build());
+
         picker.addOnItemChangedListener(new DiscreteScrollView.OnItemChangedListener<RecyclerView.ViewHolder>() {
             @Override
             public void onCurrentItemChanged(@Nullable RecyclerView.ViewHolder viewHolder, int adapterPosition) {
-                tvSongName.setText(list.get(adapterPosition).getName());
-                tvArtistName.setText(list.get(adapterPosition).getArtist());
+                tvSongName.setText(adapter.getItem(adapterPosition).getName());
+                tvArtistName.setText(adapter.getItem(adapterPosition).getArtist());
             }
         });
     }
@@ -94,6 +89,21 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
     @Override
     public void onItemClicked(TrackInfo item) {
         Log.e("MainView", "onItemClicked: "+item.getName());
+    }
+
+    public void setList(List<TrackInfo> trackInfos) {
+        adapter.setList(trackInfos);
+
+        if (trackInfos.size() == 0) {
+            tvArtistName.setVisibility(GONE);
+            picker.setVisibility(GONE);
+            tvSongName.setText("Brak historii");
+        }
+
+    }
+
+    public void setPositionLast() {
+        picker.scrollToPosition(adapter.getItemCount());
     }
 
     public interface HistoryViewContract {
@@ -114,6 +124,8 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
         }
 
         public void bind(Picasso picasso, final TrackInfo trackInfo){
+            System.out.println("PATH "+trackInfo.getAlbumCover());
+            if(trackInfo.getAlbumCover() != null && !trackInfo.getAlbumCover().equals(""))
             picasso.load(trackInfo.getAlbumCover())
                     .placeholder(R.mipmap.ic_launcher)
                     .fit()

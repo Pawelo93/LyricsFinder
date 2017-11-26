@@ -19,8 +19,8 @@ public class BrowseViewHolder {
 //        public List<TrackInfo> apply(List<TrackInfo> trackInfos) throws Exception {
 //            // reversing order
 //            List<TrackInfo> newList = new ArrayList<>();
-//            for (TrackInfo trackInfo : trackInfos) {
-//                newList.add(0, trackInfo);
+//            for (TrackInfo observeTrackInfo : trackInfos) {
+//                newList.add(0, observeTrackInfo);
 //            }
 //            return newList;
 //        }

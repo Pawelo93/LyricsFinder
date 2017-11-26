@@ -1,4 +1,4 @@
-package hexfan.lyrics.base;
+package hexfan.lyrics;
 
 import static org.junit.Assert.*;
 
