@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Lyrics2</string>
     <string name="search_hint">Szukaj</string>
+
+    <string name="show_lyrics">SHOW\nLYRICS</string>
+    <string name="no_lyrics">NO\nLYRICS</string>
 </resources>

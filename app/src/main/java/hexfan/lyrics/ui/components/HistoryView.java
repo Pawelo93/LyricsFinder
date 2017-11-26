@@ -25,6 +25,7 @@ import hexfan.lyrics.R;
 import hexfan.lyrics.model.pojo.TrackInfo;
 import hexfan.lyrics.ui.base.adapter.EaseAdapter;
 import hexfan.lyrics.ui.base.adapter.EaseAdapterContract;
+import hexfan.lyrics.ui.main.MainView;
 
 /**
  * Created by Pawel on 29.07.2017.
@@ -40,22 +41,19 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
     DiscreteScrollView picker;
 
     private EaseAdapter<TrackInfo, HistoryView.ViewHolder> adapter;
-    private HistoryViewContract historyViewContract;
+    private MainView mainView;
 
     Picasso picasso;
 
     public HistoryView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-//        MainApplication.getComponent(context).create(this);
-//        ((ComponentInterface) ((Activity) context).getApplication()).getComponent().create(this);
-
         LayoutInflater.from(context).inflate(R.layout.history_view, this);
         ButterKnife.bind(this);
     }
 
-    public void setup(Picasso picasso, HistoryViewContract historyViewContract){
+    public void setup(MainView mainView, Picasso picasso){
         this.picasso = picasso;
-        this.historyViewContract = historyViewContract;
+        this.mainView = mainView;
 
         adapter = new EaseAdapter<>(this);
 
@@ -88,7 +86,7 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
 
     @Override
     public void onItemClicked(TrackInfo item) {
-        Log.e("MainView", "onItemClicked: "+item.getName());
+        mainView.showLyricsFragment(item);
     }
 
     public void setList(List<TrackInfo> trackInfos) {
@@ -106,13 +104,9 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
         picker.scrollToPosition(adapter.getItemCount());
     }
 
-    public interface HistoryViewContract {
-        void onClick(TrackInfo trackInfo);
-    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        ImageView ivCover;
+        private ImageView ivCover;
 
         public static ViewHolder create(Context context, ViewGroup parent){
             return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.picker_item, parent, false));
@@ -124,10 +118,9 @@ public class HistoryView extends LinearLayout implements EaseAdapterContract<Tra
         }
 
         public void bind(Picasso picasso, final TrackInfo trackInfo){
-            System.out.println("PATH "+trackInfo.getAlbumCover());
             if(trackInfo.getAlbumCover() != null && !trackInfo.getAlbumCover().equals(""))
             picasso.load(trackInfo.getAlbumCover())
-                    .placeholder(R.mipmap.ic_launcher)
+                    .placeholder(R.drawable.cover_placeholder)
                     .fit()
                     .centerCrop()
                     .into(ivCover);

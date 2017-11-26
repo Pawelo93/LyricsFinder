@@ -2,6 +2,8 @@ package hexfan.lyrics.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 import com.squareup.picasso.Picasso;
 
@@ -27,11 +29,6 @@ public class MainActivity extends BaseActivity implements MainView{
     @BindView(R.id.nowListen)
     NowListenView nowListen;
 
-//    @Inject
-//    SharedPreferences sharedPreferences;
-//    @Inject
-//    DataModel dataModel;
-
     @Inject
     MainViewModel viewModel;
     @Inject
@@ -39,10 +36,6 @@ public class MainActivity extends BaseActivity implements MainView{
     @Inject
     Picasso picasso;
 
-//    @Inject
-//    BehaviorSubject<TrackInfo> trackInfoBus;
-
-//    public BrowseFragment browseFragment;
     private LyricsFragment lyricsFragment;
 
     public static MainActivity get(BaseFragment baseFragment){
@@ -51,16 +44,15 @@ public class MainActivity extends BaseActivity implements MainView{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Injector.inject(this);
         super.onCreate(savedInstanceState);
+        Injector.inject(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        System.out.println("ONCREATE");
 
-        System.out.println("ON CREATE "+viewModel);
+        addFragment(browseFragment, R.id.fragmentContainer);
 
-
-        addFragment(browseFragment);
-
+        nowListen.setup(this, picasso);
 //        trackInfoBus.subscribeRawTrackInfo(trackInfo -> {
 //            Log.e(TAG, "onCreate: "+trackInfo.getName());
 //        });
@@ -106,21 +98,6 @@ public class MainActivity extends BaseActivity implements MainView{
 
     }
 
-    private void addFragment(BaseFragment baseFragment){
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, baseFragment)
-                .commit();
-    }
-
-    private void addFragmentBackstack(BaseFragment baseFragment){
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, baseFragment)
-                .addToBackStack("baseFragment")
-                .commit();
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -130,20 +107,23 @@ public class MainActivity extends BaseActivity implements MainView{
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Injector.get().mainComponent = null;
+    }
+
+    @Override
     public void bind(){
 
         System.out.println("ACTIVITY View model activity "+viewModel + "bro fragment "+browseFragment);
 
         addSubscribe(viewModel.observeTrackInfo().subscribe(trackInfo -> {
 //            System.out.println("Geting "+trackInfo);
-            System.out.println("NOW thread "+Thread.currentThread().getName());
-            System.out.println("IN SUBSCRIBE NOW "+(trackInfo.getLyrics() != null));
-            nowListen.setup(picasso, trackInfo);
-
-            if (trackInfo.getLyrics() != null && lyricsFragment == null) {
-                lyricsFragment = LyricsFragment.newInstance(trackInfo);
-                addFragmentBackstack(lyricsFragment);
-            }
+//            System.out.println("NOW thread "+Thread.currentThread().getName());
+//            System.out.println("IN SUBSCRIBE NOW "+(trackInfo.getLyrics() != null));
+            nowListen.update(trackInfo);
+            if(!isLyricsFragmentVisible())
+                showLyricsFragment(trackInfo);
         }, throwable -> {
             System.out.println("ERROR "+throwable.getMessage());
         }));
@@ -164,12 +144,6 @@ public class MainActivity extends BaseActivity implements MainView{
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        viewModel.onDestroy(this);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         viewModel.onActivityResult(this, requestCode, resultCode, intent);
@@ -178,5 +152,35 @@ public class MainActivity extends BaseActivity implements MainView{
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+
+        nowListen.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showLyricsFragment(TrackInfo trackInfo) {
+//        Log.e(TAG, "showLyricsFragment: "+trackInfo);
+        if(trackInfo.getLyrics() == null)
+            return;
+
+        if (lyricsFragment == null) {
+            lyricsFragment = LyricsFragment.newInstance(trackInfo);
+            addFragment(lyricsFragment, R.id.fragmentContainer, "lyricsFragment");
+        }
+        else {
+            if(!lyricsFragment.isVisible()) {
+                addFragment(lyricsFragment, R.id.fragmentContainer, "lyricsFragment");
+                lyricsFragment.showLyrics(trackInfo);
+            }else
+                lyricsFragment.showLyrics(trackInfo);
+        }
+
+        if (nowListen.getTrackInfo().getArtist().equals(trackInfo.getArtist()) && nowListen.getTrackInfo().getName().equals(trackInfo.getName()))
+            nowListen.setVisibility(View.GONE);
+        else
+            nowListen.setVisibility(View.VISIBLE);
+    }
+
+    private boolean isLyricsFragmentVisible(){
+        return lyricsFragment != null && lyricsFragment.isVisible();
     }
 }

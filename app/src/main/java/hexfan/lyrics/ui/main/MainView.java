@@ -9,4 +9,8 @@ import hexfan.lyrics.model.pojo.TrackInfo;
 public interface MainView {
 
     void showTrackInfo(TrackInfo trackInfo);
+
+    void showLyricsFragment(TrackInfo trackInfo);
+
+//    void hideNowListen();
 }

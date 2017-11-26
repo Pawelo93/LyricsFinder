@@ -31,13 +31,6 @@ public class DataManager implements DataModel {
         this.trackInfoBus = bus;
     }
 
-//    @Override
-//    public void cacheTrackInfo(TrackInfo trackInfo) {
-//        database.tracksDao().insert(trackInfo);
-//    }
-
-
-
     @Override
     public Observable<TrackInfo> subscribeRawTrackInfo() {
         return trackInfoBus;

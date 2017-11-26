@@ -15,15 +15,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import hexfan.lyrics.R;
 import hexfan.lyrics.model.pojo.TrackInfo;
+import hexfan.lyrics.ui.main.MainView;
 
 /**
  * Created by Pawel on 29.07.2017.
  */
 
 public class NowListenView extends LinearLayout {
-
-//    public static final String HIDE = "hide";
-//    public static final String SHOW = "show";
 
     @BindView(R.id.tvNowListenTitle)
     TextView tvTitle;
@@ -33,28 +31,57 @@ public class NowListenView extends LinearLayout {
     ImageView ivCover;
     @BindView(R.id.ivShow)
     ImageView ivShow;
+    @BindView(R.id.tvLyricsReady)
+    TextView tvLyricsReady;
+
+    private MainView contract;
+    private Picasso picasso;
+    private TrackInfo trackInfo;
 
     public NowListenView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
-//        MainApplication.getComponent(context).create(this);
-//        ((ComponentInterface) ((Activity) context).getApplication()).getComponent().create(this);
         LayoutInflater.from(context).inflate(R.layout.now_listen_view, this);
         ButterKnife.bind(this);
     }
 
-    public void setup(Picasso picasso, TrackInfo trackInfo){
+    public void setup(MainView contract, Picasso picasso) {
+        this.picasso = picasso;
+        this.contract = contract;
+    }
+
+    public void update(TrackInfo trackInfo){
+        this.trackInfo = trackInfo;
         setVisibility(VISIBLE);
         tvTitle.setText(trackInfo.getName());
         tvArtist.setText(trackInfo.getArtist());
 
+        if (trackInfo.getLyrics() != null) {
+            tvLyricsReady.setText(R.string.show_lyrics);
+            tvLyricsReady.setTextColor(getResources().getColor(R.color.colorAccent));
+        }else{
+            tvLyricsReady.setText(R.string.no_lyrics);
+            tvLyricsReady.setTextColor(getResources().getColor(R.color.normalText));
+        }
+
         picasso.load(trackInfo.getAlbumCover())
+                .placeholder(R.drawable.cover_placeholder)
                 .fit()
                 .into(ivCover);
     }
 
-    @OnClick(R.id.ivShow)
+    @OnClick(R.id.tvLyricsReady)
     public void showLyrics(){
+        if(trackInfo.getLyrics() == null)
+            return;
 
+        if(contract != null)
+            contract.showLyricsFragment(trackInfo);
     }
+
+    public TrackInfo getTrackInfo(){
+        return trackInfo;
+    }
+//    public interface NowListenViewContract{
+//        void showLyricsFragment(TrackInfo trackInfo);
+//    }
 }

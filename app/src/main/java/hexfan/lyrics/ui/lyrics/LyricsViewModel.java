@@ -2,6 +2,7 @@ package hexfan.lyrics.ui.lyrics;
 
 import hexfan.lyrics.model.pojo.TrackInfo;
 import hexfan.lyrics.model.pojo.TrackInfoRequest;
+import io.reactivex.Observable;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableObserver;
 
@@ -10,6 +11,8 @@ import io.reactivex.observers.DisposableObserver;
  */
 
 public class LyricsViewModel {
+
+
 
 //    @Override
 //    public void loadTrackInfo(String artist, String track) {

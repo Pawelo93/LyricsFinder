@@ -39,8 +39,7 @@ public class MainViewModel extends ViewModel {
                         model.getLyrics(trackInfo).onErrorReturn(throwable -> trackInfo), (trackWithData, trackWithLyrics) -> {
                             trackWithData.setLyrics(trackWithLyrics.getLyrics());
 
-                            if(trackWithData.getAlbumCover() != null && !trackWithData.getAlbumCover().equals("") &&
-                                    trackWithData.getLyrics() != null && !trackWithData.getLyrics().equals("")) {
+                            if(trackWithData.getLyrics() != null && !trackWithData.getLyrics().equals("")) {
                                 databaseModel.cacheTrackInfo(trackWithData);
                             }
                             return trackWithData;
@@ -51,9 +50,15 @@ public class MainViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void onDestroy(BaseActivity baseActivity) {
+    @Override
+    protected void onCleared() {
+        super.onCleared();
         if (spotifyModel != null)
-            spotifyModel.onDestroy(baseActivity);
+            spotifyModel.onDestroy();
+    }
+
+    public void onDestroy(BaseActivity baseActivity) {
+
     }
 
     public void onActivityResult(BaseActivity baseActivity, int requestCode, int resultCode, Intent intent) {

@@ -19,12 +19,13 @@ import hexfan.lyrics.model.pojo.TrackInfo;
 import hexfan.lyrics.ui.base.BaseFragment;
 import hexfan.lyrics.ui.components.HistoryView;
 import hexfan.lyrics.ui.main.MainActivity;
+import hexfan.lyrics.ui.main.MainView;
 
 /**
  * Created by Pawel on 30.07.2017.
  */
 
-public class BrowseFragment extends BaseFragment implements BrowseView, HistoryView.HistoryViewContract {
+public class BrowseFragment extends BaseFragment implements BrowseView {
 
     @BindView(R.id.etSearch)
     EditText etSearch;
@@ -61,17 +62,8 @@ public class BrowseFragment extends BaseFragment implements BrowseView, HistoryV
 
     private void init(){
 
-        historyView.setup(picasso, this);
+        historyView.setup((MainView) getActivity(), picasso);
 
-
-
-
-//        historyView = new HistoryView(getContext());
-//        container.addView(historyView);
-
-//        MainActivity.get(this).presenter.loadHistoryCache();
-
-//        presenter.getTrackInfo("Scorpions", "Robot Man");
 
     }
 
@@ -81,10 +73,5 @@ public class BrowseFragment extends BaseFragment implements BrowseView, HistoryV
             historyView.setList(trackInfos);
             historyView.setPositionLast();
         }));
-    }
-
-    @Override
-    public void onClick(TrackInfo trackInfo) {
-        System.out.println("CLICKED TO "+trackInfo.getName());
     }
 }

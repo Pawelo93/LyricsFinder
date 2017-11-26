@@ -31,6 +31,8 @@ public class Injector {
     }
 
     public static void inject(MainActivity mainActivity){
+        System.out.println("BEFORE injecto main "+Injector.get().mainComponent);
+
         if(Injector.get().mainComponent == null)
             setupMain(mainActivity);
         Injector.get().mainComponent.inject(mainActivity);
@@ -41,6 +43,7 @@ public class Injector {
     }
 
     public static void inject(BrowseFragment browseFragment) {
+        System.out.println("BEFORE injecto browse");
         Injector.get().mainComponent.inject(browseFragment);
     }
 

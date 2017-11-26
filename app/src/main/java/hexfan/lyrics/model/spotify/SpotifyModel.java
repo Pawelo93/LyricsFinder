@@ -20,7 +20,7 @@ public interface SpotifyModel extends PlayerNotificationCallback, ConnectionStat
 
 //    Observable<TrackInfo> subscribeRawTrackInfo();
 
-    void onDestroy(BaseActivity baseActivity);
+    void onDestroy();
 
     void onActivityResult(BaseActivity baseActivity, int requestCode, int resultCode, Intent intent);
 }

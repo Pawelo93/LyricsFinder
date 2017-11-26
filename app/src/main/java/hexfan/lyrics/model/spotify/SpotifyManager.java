@@ -100,7 +100,7 @@ public class SpotifyManager implements SpotifyModel {
 //    }
 
     @Override
-    public void onDestroy(BaseActivity baseActivity) {
+    public void onDestroy() {
         Spotify.destroyPlayer(this);
         player = null;
 //        if (broadcastReceiver != null) {

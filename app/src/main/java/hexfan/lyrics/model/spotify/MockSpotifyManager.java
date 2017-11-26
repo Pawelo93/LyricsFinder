@@ -52,7 +52,7 @@ public class MockSpotifyManager implements SpotifyModel {
 //    }
 
     @Override
-    public void onDestroy(BaseActivity baseActivity) {
+    public void onDestroy() {
 
     }
 

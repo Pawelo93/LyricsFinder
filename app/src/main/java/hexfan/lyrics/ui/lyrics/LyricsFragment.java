@@ -2,7 +2,6 @@ package hexfan.lyrics.ui.lyrics;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import hexfan.lyrics.R;
 import hexfan.lyrics.di.Injector;
 import hexfan.lyrics.model.pojo.TrackInfo;
 import hexfan.lyrics.ui.base.BaseFragment;
-import hexfan.lyrics.ui.main.MainActivity;
 
 /**
  * Created by Pawel on 30.07.2017.
@@ -48,8 +46,9 @@ public class LyricsFragment extends BaseFragment implements LyricsView {
 //    @Inject
     LyricsViewModel viewModel;
 
-    public static LyricsFragment newInstance(TrackInfo trackInfo) {
+    private TrackInfo trackInfo;
 
+    public static LyricsFragment newInstance(TrackInfo trackInfo) {
         Bundle args = new Bundle();
         args.putParcelable(EXTRA_TRACK_INFO, trackInfo);
         LyricsFragment fragment = new LyricsFragment();
@@ -63,8 +62,9 @@ public class LyricsFragment extends BaseFragment implements LyricsView {
         Injector.inject(this);
         View view = inflater.inflate(R.layout.lyrics_fragment, container, false);
         ButterKnife.bind(this, view);
-        init();
-        showLyrics(getArguments().getParcelable(EXTRA_TRACK_INFO));
+        if(trackInfo == null)
+            trackInfo = getArguments().getParcelable(EXTRA_TRACK_INFO);
+        showLyrics(trackInfo);
         return view;
     }
 
@@ -73,14 +73,13 @@ public class LyricsFragment extends BaseFragment implements LyricsView {
 
     }
 
-
-    private void init(){
-
-
-    }
-
-
     public void showLyrics(TrackInfo trackInfo){
+        this.trackInfo = trackInfo;
+        if(trackInfo.getName() != null)
+            tvTrackTitle.setText(trackInfo.getName());
+
+        if(trackInfo.getArtist() != null)
+            tvArtist.setText(trackInfo.getArtist());
 
         if(trackInfo.getAlbum() != null)
             tvAlbum.setText(trackInfo.getAlbum());
@@ -90,6 +89,7 @@ public class LyricsFragment extends BaseFragment implements LyricsView {
 
         if(trackInfo.getAlbumCover() != null) {
             picasso.load(trackInfo.getAlbumCover())
+                    .placeholder(R.drawable.cover_placeholder)
                     .fit()
                     .into(ivCover);
         }
