@@ -1,5 +1,6 @@
 package hexfan.lyrics.ui.main;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,10 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasFragmentInjector;
 import hexfan.lyrics.R;
 import hexfan.lyrics.di.Injector;
 import hexfan.lyrics.model.pojo.TrackInfo;
@@ -22,9 +27,12 @@ import hexfan.lyrics.ui.components.NowListenView;
 import hexfan.lyrics.ui.lyrics.LyricsFragment;
 import hexfan.lyrics.utils.Config;
 
-public class MainActivity extends BaseActivity implements MainView{
+public class MainActivity extends BaseActivity implements MainView, HasFragmentInjector{
 
     private static final String TAG = "MainActivity";
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
 
     @BindView(R.id.nowListen)
     NowListenView nowListen;
@@ -44,15 +52,18 @@ public class MainActivity extends BaseActivity implements MainView{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        Injector.inject(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        System.out.println("ONCREATE");
+        System.out.println("ONCREATE "+picasso+"   view "+viewModel);
 
         addFragment(browseFragment, R.id.fragmentContainer);
 
         nowListen.setup(this, picasso);
+
+
+
 //        trackInfoBus.subscribeRawTrackInfo(trackInfo -> {
 //            Log.e(TAG, "onCreate: "+trackInfo.getName());
 //        });
@@ -104,12 +115,6 @@ public class MainActivity extends BaseActivity implements MainView{
 
         if(Config.START_SPOTIFY_SERVICE)
             startSpotifyService();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Injector.get().mainComponent = null;
     }
 
     @Override
@@ -182,5 +187,10 @@ public class MainActivity extends BaseActivity implements MainView{
 
     private boolean isLyricsFragmentVisible(){
         return lyricsFragment != null && lyricsFragment.isVisible();
+    }
+
+    @Override
+    public AndroidInjector<Fragment> fragmentInjector() {
+        return fragmentDispatchingAndroidInjector;
     }
 }

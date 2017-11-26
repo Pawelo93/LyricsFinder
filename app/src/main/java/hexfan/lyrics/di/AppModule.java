@@ -11,7 +11,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.TimeUnit;
 
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import hexfan.lyrics.model.ApiManager;
@@ -21,7 +20,6 @@ import hexfan.lyrics.model.DatabaseDataManager;
 import hexfan.lyrics.model.DatabaseDataModel;
 import hexfan.lyrics.model.db.AppDatabase;
 import hexfan.lyrics.model.pojo.TrackInfo;
-import hexfan.lyrics.ui.main.MainApplication;
 import io.reactivex.subjects.BehaviorSubject;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -35,36 +33,24 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Pawel on 20.06.2017.
  */
 
-@Module(includes = RxBusModule.class)
+@Module
 public class AppModule {
 
-    Application application;
-
-    public AppModule(Application application){
-        this.application = application;
-    }
-
     @Provides
     @AppScope
-    Application provideApplication(){
-        return application;
-    }
-
-    @Provides
-    @AppScope
-    Context providesContext(){
+    Context providesContext(Application application){
         return application.getApplicationContext();
     }
 
     @Provides
     @AppScope
-    Picasso providePicasso() {
+    Picasso providePicasso(Application application) {
         return new Picasso.Builder(application).build();
     }
 
     @Provides
     @AppScope
-    SharedPreferences providesSharedPreferences(){
+    SharedPreferences providesSharedPreferences(Application application){
         return PreferenceManager.getDefaultSharedPreferences(application);
     }
 
@@ -98,7 +84,7 @@ public class AppModule {
 
     @Provides
     @AppScope
-    Cache providesHttpCache(){
+    Cache providesHttpCache(Application application){
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         return new Cache(application.getCacheDir(), cacheSize);
     }

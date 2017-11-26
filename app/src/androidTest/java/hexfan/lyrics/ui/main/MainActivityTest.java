@@ -31,8 +31,6 @@ import hexfan.lyrics.base.AsyncTaskSchedulerRule;
 import hexfan.lyrics.R;
 import hexfan.lyrics.base.TestApplication;
 import hexfan.lyrics.di.Injector;
-import hexfan.lyrics.di.main.MainModule;
-import hexfan.lyrics.di.main.MainComponent;
 import hexfan.lyrics.model.DataModel;
 import hexfan.lyrics.model.pojo.TrackInfo;
 import hexfan.lyrics.ui.browse.BrowseFragment;
@@ -75,7 +73,7 @@ public class MainActivityTest {
     }
 
     @Module
-    public static class TestMainActivityModule extends MainModule {
+    public static class TestMainActivityModule {
 
         public TestMainActivityModule(MainActivity mainActivity) {
             super(mainActivity);

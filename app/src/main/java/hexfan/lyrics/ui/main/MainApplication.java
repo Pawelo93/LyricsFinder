@@ -1,7 +1,15 @@
 package hexfan.lyrics.ui.main;
 
+import android.app.Activity;
 import android.app.Application;
+import android.app.Service;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
+import dagger.android.HasServiceInjector;
 import hexfan.lyrics.di.AppComponent;
 import hexfan.lyrics.di.AppModule;
 import hexfan.lyrics.di.DaggerAppComponent;
@@ -12,9 +20,13 @@ import hexfan.lyrics.ui.base.BaseFragment;
  * Created by Pawel on 20.06.2017.
  */
 
-public class MainApplication extends Application{
+public class MainApplication extends Application implements HasActivityInjector, HasServiceInjector {
 
-    public static MainApplication INSTANCE;
+    @Inject
+    DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
+    @Inject
+    DispatchingAndroidInjector<Service> serviceDispatchingAndroidInjector;
+//    public static MainApplication INSTANCE;
     public AppComponent component;
 
     public static MainApplication get(BaseActivity baseActivity) {
@@ -28,13 +40,31 @@ public class MainApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        INSTANCE = this;
+
         component = DaggerAppComponent
                 .builder()
-                .appModule(new AppModule(this))
+                .application(this)
                 .build();
 
         component.inject(this);
 
+//        INSTANCE = this;
+//        component = DaggerAppComponent
+//                .builder()
+//                .appModule(new AppModule(this))
+//                .build();
+//
+//        component.inject(this);
+
+    }
+
+    @Override
+    public AndroidInjector<Activity> activityInjector() {
+        return activityDispatchingAndroidInjector;
+    }
+
+    @Override
+    public AndroidInjector<Service> serviceInjector() {
+        return serviceDispatchingAndroidInjector;
     }
 }

@@ -14,6 +14,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.AndroidInjection;
 import hexfan.lyrics.R;
 import hexfan.lyrics.di.Injector;
 import hexfan.lyrics.model.pojo.TrackInfo;
@@ -40,11 +41,10 @@ public class LyricsFragment extends BaseFragment implements LyricsView {
     @BindView(R.id.tvLyrics)
     TextView tvLirycs;
 
-
     @Inject
     Picasso picasso;
-//    @Inject
-    LyricsViewModel viewModel;
+
+//    LyricsViewModel viewModel;
 
     private TrackInfo trackInfo;
 
@@ -59,7 +59,7 @@ public class LyricsFragment extends BaseFragment implements LyricsView {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Injector.inject(this);
+        AndroidInjection.inject(this);
         View view = inflater.inflate(R.layout.lyrics_fragment, container, false);
         ButterKnife.bind(this, view);
         if(trackInfo == null)

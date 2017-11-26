@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.AndroidInjection;
 import hexfan.lyrics.R;
 import hexfan.lyrics.di.Injector;
 import hexfan.lyrics.model.pojo.TrackInfo;
@@ -51,7 +52,7 @@ public class BrowseFragment extends BaseFragment implements BrowseView {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Injector.inject(this);
+        AndroidInjection.inject(this);
         View view = inflater.inflate(R.layout.browse_fragment, container, false);
         ButterKnife.bind(this, view);
         init();

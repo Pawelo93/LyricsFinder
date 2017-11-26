@@ -39,7 +39,7 @@ public class SpotifyCheckService extends Service {
 
     @Override
     public void onCreate() {
-        Injector.inject(this);
+        AndroidInjection.inject(this);
         // To avoid cpu-blocking, we create a background handler to run our service
         HandlerThread thread = new HandlerThread("TutorialService", Thread.NORM_PRIORITY);
         // start the new handler thread

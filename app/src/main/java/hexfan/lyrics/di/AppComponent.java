@@ -1,23 +1,27 @@
 package hexfan.lyrics.di;
 
+import android.app.Application;
+
+import dagger.BindsInstance;
 import dagger.Component;
-import hexfan.lyrics.di.main.MainComponent;
-import hexfan.lyrics.di.main.MainModule;
-import hexfan.lyrics.model.spotify.SpotifyCheckService;
+import dagger.android.AndroidInjectionModule;
 import hexfan.lyrics.ui.main.MainApplication;
 
 /**
  * Created by Pawel on 20.06.2017.
  */
 
-@Component(modules = {AppModule.class, RxBusModule.class})
+@Component(modules = {AppModule.class, RxBusModule.class, AndroidInjectionModule.class, ActivityBuilder.class})
 @AppScope
 public interface AppComponent{
 
-    void inject(MainApplication mainApplication);
+    @Component.Builder
+    interface Builder {
+        @BindsInstance
+        Builder application(Application application);
+        AppComponent build();
+    }
 
-    MainComponent addComponent(MainModule mainModule);
-
-    void inject(SpotifyCheckService spotifyCheckService);
+    void inject(MainApplication app);
 }
 
