@@ -61,52 +61,6 @@ public class MainActivity extends BaseActivity implements MainView, HasFragmentI
         addFragment(browseFragment, R.id.fragmentContainer);
 
         nowListen.setup(this, picasso);
-
-
-
-//        trackInfoBus.subscribeRawTrackInfo(trackInfo -> {
-//            Log.e(TAG, "onCreate: "+trackInfo.getName());
-//        });
-
-//        trackInfoBus.subscribeRawTrackInfo(new DisposableObserver<TrackInfo>() {
-//            @Override
-//            public void onNext(TrackInfo observeTrackInfo) {
-//                Log.e(TAG, "onNext: "+observeTrackInfo.getName());
-//                presenter.loadTrackInfo(observeTrackInfo.getArtist(), observeTrackInfo.getName());
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                Log.e(TAG, "onError: "+e.getMessage());
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//
-//            }
-//        });
-//
-//
-//        nowListenBus.subscribeRawTrackInfo(new DisposableObserver<String>() {
-//            @Override
-//            public void onNext(String event) {
-//                if (event.equals(NowListenView.HIDE))
-//                    nowListen.setVisibility(View.GONE);
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//
-//            }
-//        });
-//
-//        nowListenBus.onNext(NowListenView.HIDE);
-
     }
 
     @Override
@@ -123,19 +77,12 @@ public class MainActivity extends BaseActivity implements MainView, HasFragmentI
         System.out.println("ACTIVITY View model activity "+viewModel + "bro fragment "+browseFragment);
 
         addSubscribe(viewModel.observeTrackInfo().subscribe(trackInfo -> {
-//            System.out.println("Geting "+trackInfo);
-//            System.out.println("NOW thread "+Thread.currentThread().getName());
-//            System.out.println("IN SUBSCRIBE NOW "+(trackInfo.getLyrics() != null));
             nowListen.update(trackInfo);
             if(!isLyricsFragmentVisible())
                 showLyricsFragment(trackInfo);
         }, throwable -> {
             System.out.println("ERROR "+throwable.getMessage());
         }));
-
-
-
-
     }
 
     @Override
@@ -163,7 +110,6 @@ public class MainActivity extends BaseActivity implements MainView, HasFragmentI
 
     @Override
     public void showLyricsFragment(TrackInfo trackInfo) {
-//        Log.e(TAG, "showLyricsFragment: "+trackInfo);
         if(trackInfo.getLyrics() == null)
             return;
 

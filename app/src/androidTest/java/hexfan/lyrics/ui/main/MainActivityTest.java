@@ -60,46 +60,6 @@ public class MainActivityTest {
     @Rule
     public AsyncTaskSchedulerRule asyncTaskSchedulerRule = new AsyncTaskSchedulerRule();
 
-    @Singleton
-    @Subcomponent(modules = {TestMainActivityModule.class})
-    public interface TestMainActivityComponent extends MainComponent {
-        void inject(MainActivityTest mainActivityTest);
-
-        void inject(BrowseFragmentTest browseFragmentTest);
-//
-//        BrowseFragment browseFragment();
-//        MainViewModel mainViewModel();
-
-    }
-
-    @Module
-    public static class TestMainActivityModule {
-
-        public TestMainActivityModule(MainActivity mainActivity) {
-            super(mainActivity);
-        }
-
-        @Provides
-        @Singleton
-        MainViewModel provideMainViewModel(){
-            System.out.println("Provide mock");
-            return Mockito.mock(MainViewModel.class);
-        }
-
-//        @Provides
-//        @Singleton
-//        BrowseViewModel provideBrowseViewModel(){
-//            System.out.println("Provide mock");
-//            return Mockito.mock(BrowseViewModel.class);
-//        }
-//
-//        @Provides
-//        @Singleton
-//        BrowseFragment provideBrowseFragment(){
-//            return BrowseFragment.newInstance();
-//        }
-    }
-
     @Inject
     MainViewModel viewModel;
     @Inject
@@ -115,15 +75,15 @@ public class MainActivityTest {
         Config.test();
         MockitoAnnotations.initMocks(this);
 
-        TestMainActivityModule module = new TestMainActivityModule(rule.getActivity());
-        TestMainActivityComponent testMainActivityComponent = ((TestApplication.TestComponent) TestApplication.INSTANCE.component)
-                .addComponent(module);
+//        TestApplication.INSTANCE.component.inject();
 
-        testMainActivityComponent.inject(this);
-
-        Injector.get().mainComponent = testMainActivityComponent;
-
-//        System.out.println("TEST View model test "+viewModel + "brow fragment "+browseFragment);
+//        TestMainActivityModule module = new TestMainActivityModule(rule.getActivity());
+//        TestMainActivityComponent testMainActivityComponent = ((TestApplication.TestComponent) TestApplication.INSTANCE.component)
+//                .addComponent(module);
+//
+//        testMainActivityComponent.inject(this);
+//
+//        Injector.get().mainComponent = testMainActivityComponent;
     }
 
     @Test

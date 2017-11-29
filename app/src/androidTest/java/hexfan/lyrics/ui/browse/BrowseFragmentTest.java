@@ -58,43 +58,12 @@ public class BrowseFragmentTest {
         MockitoAnnotations.initMocks(this);
 
 
-        MainActivityTest.TestMainActivityModule module = new MainActivityTest.TestMainActivityModule(rule.getActivity());
-        MainActivityTest.TestMainActivityComponent testMainActivityComponent = ((TestApplication.TestComponent) TestApplication.INSTANCE.component)
-                .addComponent(module);
 
-        testMainActivityComponent.inject(this);
-
-//        MainActivityTest.TestMainActivityModule activityModule = new MainActivityTest.TestMainActivityModule(rule.getActivity());
-//
-//        MainActivityTest.TestMainActivityComponent testBrowseMainActivityComponent = ((TestApplication.TestComponent) TestApplication.INSTANCE.component)
-//                .addComponent(activityModule);
-
-//        TestApplication.TestComponent testComponent = (TestApplication.TestComponent) TestApplication.INSTANCE.component;
-//        TestBrowseMainActivityComponent testBrowseMainActivityComponent = ((TestApplication.TestComponent) testComponent)
-//                .addComponent(activityModule);
-
-//        TestBrowseMainActivityComponent testBrowseMainActivityComponent =
-//                ((TestApplication.TestComponent) TestApplication.INSTANCE.component).addComponent(activityModule);
-
-//        testMainActivityComponent.inject(this);
-
-//        browseFragment = testBrowseMainActivityComponent.browseFragment();
-
-//        Injector.get().mainComponent = testBrowseMainActivityComponent;
-//
-//        TestBrowseFragmentModule module = new TestBrowseFragmentModule(browseFragment);
-//        TestBrowseFragmentComponent testBrowseFragmentComponent = ((TestApplication.TestComponent) TestApplication.INSTANCE.component)
+//        MainActivityTest.TestMainActivityModule module = new MainActivityTest.TestMainActivityModule(rule.getActivity());
+//        MainActivityTest.TestMainActivityComponent testMainActivityComponent = ((TestApplication.TestComponent) TestApplication.INSTANCE.component)
 //                .addComponent(module);
 //
-//        testBrowseFragmentComponent.inject(this);
-//
-//        Injector.get().browseFragmentComponent = testBrowseFragmentComponent;
-
-
-//        ((MainActivityTest.TestComponent) TestApplication.INSTANCE.create(rule.getActivity())).inject(this);
-//
-//        ((TestComponent) TestApplication.INSTANCE.create(browseFragment)).inject(this);
-//        System.out.println("TEST View model test "+viewModel + "brow fragment "+browseFragment);
+//        testMainActivityComponent.inject(this);
     }
 
     @Test

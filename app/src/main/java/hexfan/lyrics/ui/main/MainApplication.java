@@ -26,7 +26,7 @@ public class MainApplication extends Application implements HasActivityInjector,
     DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
     @Inject
     DispatchingAndroidInjector<Service> serviceDispatchingAndroidInjector;
-//    public static MainApplication INSTANCE;
+
     public AppComponent component;
 
     public static MainApplication get(BaseActivity baseActivity) {
@@ -47,15 +47,6 @@ public class MainApplication extends Application implements HasActivityInjector,
                 .build();
 
         component.inject(this);
-
-//        INSTANCE = this;
-//        component = DaggerAppComponent
-//                .builder()
-//                .appModule(new AppModule(this))
-//                .build();
-//
-//        component.inject(this);
-
     }
 
     @Override

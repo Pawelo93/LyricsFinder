@@ -1,9 +1,21 @@
 package hexfan.lyrics.base;
 
+import android.app.Activity;
+import android.app.Application;
+import android.app.Service;
+
+import javax.inject.Inject;
+
+import dagger.BindsInstance;
 import dagger.Component;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.HasActivityInjector;
+import dagger.android.HasServiceInjector;
 import hexfan.lyrics.di.AppComponent;
 import hexfan.lyrics.di.AppModule;
 import hexfan.lyrics.di.AppScope;
+import hexfan.lyrics.di.DaggerAppComponent;
 import hexfan.lyrics.di.RxBusModule;
 import hexfan.lyrics.ui.browse.BrowseFragmentTest;
 import hexfan.lyrics.ui.main.MainActivityTest;
@@ -15,20 +27,46 @@ import hexfan.lyrics.ui.main.MainApplication;
 
 public class TestApplication extends MainApplication {
 
-    @Component(modules = {AppModule.class, RxBusModule.class})
-    @AppScope
-    public interface TestComponent extends AppComponent{
+//    @Inject
+//    DispatchingAndroidInjector<Activity> activityDispatchingAndroidInjector;
+//    @Inject
+//    DispatchingAndroidInjector<Service> serviceDispatchingAndroidInjector;
 
-        void inject(TestApplication testApplication);
+//
+//    @Component(modules = {AppModule.class, RxBusModule.class})
+//    public interface TestAppComponent extends AppComponent{
+//
+//        @Component.Builder
+//        interface Builder {
+//            @BindsInstance
+//            TestAppComponent.Builder application(Application application);
+//            TestAppComponent build();
+//        }
+//
+//        void inject(TestApplication app);
+//    }
 
-        MainActivityTest.TestMainActivityComponent addComponent(MainActivityTest.TestMainActivityModule mainActivityModule);
-    }
-
+//    public static TestApplication INSTANCE;
 
     @Override
     public void onCreate() {
-        super.onCreate();
-        INSTANCE = this;
-        component = DaggerTestApplication_TestComponent.builder().appModule(new AppModule(this)).build();
+
+//        INSTANCE = this;
+//        component = DaggerTestAppComponent
+//                .builder()
+//                .application(this)
+//                .build();
+
+//        component.inject(this);
     }
+
+//    @Override
+//    public AndroidInjector<Activity> activityInjector() {
+//        return activityDispatchingAndroidInjector;
+//    }
+//
+//    @Override
+//    public AndroidInjector<Service> serviceInjector() {
+//        return serviceDispatchingAndroidInjector;
+//    }
 }
